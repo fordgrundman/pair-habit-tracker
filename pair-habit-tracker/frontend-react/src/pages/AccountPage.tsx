@@ -25,14 +25,13 @@ function AccountPage() {
     );
 
     if (response.status === 201) {
-      alert("Successfully created the account");
       localStorage.setItem("username", username);
       setCachedUsername(username);
 
       //only navigate to Habits List after successful signup
       navigate("/habits");
     } else {
-      alert("Failed to create account, status code = " + response.status);
+      alert("Failed to create account, username may already exist");
     }
   };
 
@@ -53,21 +52,23 @@ function AccountPage() {
     );
 
     if (response.status === 200) {
-      alert("Successfully logged in");
       localStorage.setItem("username", username);
       setCachedUsername(username);
 
       //only navigate to Habits List after successful login
       navigate("/habits");
     } else {
-      alert("Failed to log in, status code = " + response.status);
+      alert("Login failed. Incorrect username or password");
     }
   };
 
   return (
     <>
-      <h1>Login</h1>
-      <p>Currently logged in as: {cachedUsername}</p>
+      <h1>Account</h1>
+      <p>
+        Currently logged in as:
+        <span style={{ color: "blue" }}> {cachedUsername}</span>
+      </p>
       <div id="login-container">
         <div className="login-field-wrapper">
           <label> Username: </label>
@@ -87,9 +88,14 @@ function AccountPage() {
             onChange={(event) => setPassword(event.target.value)}
           />
         </div>
+        <br />
         <div id="login-buttons-wrapper">
-          <button onClick={login}>Login</button>
-          <button onClick={signUp}>Create Account</button>
+          <button className="habit-input-button" onClick={login}>
+            Login
+          </button>
+          <button className="habit-input-button" onClick={signUp}>
+            Create Account
+          </button>
         </div>
       </div>
     </>

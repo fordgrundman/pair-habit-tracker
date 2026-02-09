@@ -34,37 +34,51 @@ function AddHabit() {
     );
 
     if (response.status === 201) {
-      alert("Successfully created the habit");
       navigate("/habits");
     } else {
-      alert("Failed to create habit, status code = " + response.status);
+      alert("Failed to create habit.");
     }
   };
 
   return (
     <>
       <h1>Add Habit</h1>
-      <label>Title: </label>
-      <input
-        type="text"
-        id="habit-title-input"
-        value={title}
-        onChange={(event) => setTitle(event.target.value)}
-      />
-      <br />
-      <label>Interval: </label>
-      <select
-        id="habit-interval-select"
-        value={interval}
-        onChange={(event) => setInterval(event.target.value)}
-      >
-        <option value="daily">Daily</option>
-        <option value="weekly">Weekly</option>
-      </select>
-      <br />
-      <button id="add-habit-submit-button" onClick={requestHabitCreation}>
-        Add
-      </button>
+      <div className="habit-inputs-container">
+        <div className="habit-input-wrapper">
+          <label className="title-input-label">Title: </label>
+          <input
+            type="text"
+            id="habit-title-input"
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+          />
+        </div>
+        <div className="habit-input-wrapper">
+          <label className="interval-input-label">Interval: </label>
+          <select
+            id="habit-interval-select"
+            value={interval}
+            onChange={(event) => setInterval(event.target.value)}
+          >
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+          </select>
+        </div>
+      </div>
+      <div className="habit-input-buttons-wrapper">
+        <button
+          className="habit-input-button"
+          onClick={() => navigate("/habits")}
+        >
+          Cancel
+        </button>
+        <button
+          className="habit-input-button habit-input-confirm-button"
+          onClick={requestHabitCreation}
+        >
+          Add
+        </button>
+      </div>
     </>
   );
 }

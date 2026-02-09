@@ -26,7 +26,7 @@ function App() {
         </Routes>
       </main>
       <footer>
-        <div id="tagline">Track your habits to stay consistent</div>
+        <div id="tagline">~Track your habits to stay consistent~</div>
         <p>© Ford Grundman</p>
       </footer>
     </Router>

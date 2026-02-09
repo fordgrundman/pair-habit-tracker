@@ -102,7 +102,10 @@ function HabitsList() {
   return (
     <>
       <h1>Habits List</h1>
-      <p>Hello {cachedUsername}!</p>
+      <p>
+        Hello
+        <span style={{ color: "blue" }}> {cachedUsername}</span>!
+      </p>
       <button id="add-habit-button" onClick={() => navigate("/add-habit")}>
         Add Habit
       </button>
@@ -113,6 +116,7 @@ function HabitsList() {
             _id={habit._id}
             title={habit.title}
             interval={habit.interval}
+            intervalLabel={`${habit.interval[0].toUpperCase()}${habit.interval.slice(1)}`} //capitalize "daily" to "Daily", "weekly" to "Weekly"
             completed={habit.completed}
             onDelete={deleteHabit}
             onToggleCompleted={toggleCompleted}

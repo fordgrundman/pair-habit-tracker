@@ -10,6 +10,7 @@ type HabitProps = HabitType & {
   onDelete: (id: string) => void;
   onToggleCompleted: (id: string, completed: boolean) => void;
   onEdit: (habit: HabitType) => void;
+  intervalLabel?: string;
 };
 
 function Habit({
@@ -20,7 +21,9 @@ function Habit({
   onDelete,
   onToggleCompleted,
   onEdit,
+  intervalLabel,
 }: HabitProps) {
+  const displayInterval = intervalLabel ?? interval;
   return (
     <div className="habit-container">
       <input
@@ -31,14 +34,19 @@ function Habit({
       />
       <div className="habit-inner-wrapper">
         <div className="habit-title">{title}</div>
-        <div className="habit-interval">{interval}</div>
+        <div className="habit-interval">{displayInterval}</div>
       </div>
-      <div className="edit-icon" onClick={() => onEdit({
-        _id,
-        title,
-        interval,
-        completed,
-      })} />
+      <div
+        className="edit-icon"
+        onClick={() =>
+          onEdit({
+            _id,
+            title,
+            interval,
+            completed,
+          })
+        }
+      />
       <div
         className="delete-icon"
         onClick={() => {

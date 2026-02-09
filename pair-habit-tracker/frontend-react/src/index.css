@@ -77,12 +77,18 @@ li {
 #tagline {
   font-size: 1.5rem;
 }
-/* --------------------------------------------------Account Page Styles --------------------------------------------------*/
+/* --------------------------------------------Account Page Styles --------------------------------------------------*/
 #login-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
+}
+
+.login-field-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 #login-buttons-wrapper {
@@ -91,7 +97,20 @@ li {
   gap: 0.5rem;
   justify-content: center;
 }
-/* -----------------------------------------Habits List Styles ----------------------------------------------------------*/
+
+#login-container label {
+  font-size: 1.25rem;
+  width: 7rem;
+  text-align: right;
+}
+
+#login-container input {
+  font-size: 1.1rem;
+  padding: 0.4rem 0.6rem;
+  height: 1.5rem;
+  width: 14rem;
+}
+/*-----------------------------------------Habits List Styles -------------------------------------------------------*/
 .habits-list-container {
   display: flex;
   justify-content: center;
@@ -148,8 +167,6 @@ li {
   cursor: pointer;
 }
 
-/* ------------------------------------------------Add Habit Page --------------------------------------------------*/
-
 #add-habit-button {
   width: 10rem;
   height: 2.5rem;
@@ -163,4 +180,65 @@ li {
 #add-habit-button:hover {
   background-color: #0eba0e;
   cursor: pointer;
+}
+
+/* ------------------------------------------------Add/Edit Habit Pages --------------------------------------------------*/
+.habit-input-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 32.5%;
+}
+
+.habit-input-buttons-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+  gap: 1rem;
+}
+.habit-input-button {
+  padding: 1rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 0.2rem;
+}
+
+.habit-input-button:hover {
+  cursor: pointer;
+  background-color: lightgrey;
+}
+
+.habit-input-confirm-button {
+  background-color: #08eb08;
+}
+
+.habit-input-confirm-button:hover {
+  cursor: pointer;
+  background-color: #0eba0e;
+}
+
+.habit-inputs-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.habit-inputs-container label {
+  font-size: 1.2rem;
+  width: 7rem;
+  text-align: right;
+}
+
+.habit-inputs-container input,
+.habit-inputs-container select {
+  font-size: 1.1rem;
+  padding: 0.4rem 0.6rem;
+  height: 2.2rem;
+}
+
+#edit-habit-completed-checkbox {
+  margin-left: -0.4rem;
 }
