@@ -1,7 +1,5 @@
 import "dotenv/config";
 import express from "express";
-import asyncHandler from "express-async-handler";
-import * as habits from "./exercise_model.mjs";
 
 const app = express();
 app.use(express.json());
