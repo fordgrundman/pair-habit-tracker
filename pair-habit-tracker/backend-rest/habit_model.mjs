@@ -13,6 +13,21 @@ const userSchema = new mongoose.Schema(
 
 const User = mongoose.model("User", userSchema);
 
+const habitSchema = new mongoose.Schema(
+  {
+    username: { type: String, required: true, index: true, trim: true },
+    title: { type: String, required: true, trim: true },
+    interval: {
+      type: String,
+      required: true,
+      enum: ["daily", "weekly"],
+    },
+  },
+  { timestamps: true },
+);
+
+const Habit = mongoose.model("Habit", habitSchema);
+
 //connect to MongoDB server
 async function connect() {
   try {
@@ -36,7 +51,14 @@ async function findUserByCredentials({ username, password }) {
   return await User.findOne({ username, password }).exec();
 }
 
-async function createHabit() {}
+async function getHabitsByUsername(username) {
+  return await Habit.find({ username }).exec();
+}
+
+async function createHabit({ username, title, interval }) {
+  const habit = new Habit({ username, title, interval });
+  return await habit.save();
+}
 async function deleteHabit() {}
 async function updateHabit() {}
 
@@ -44,6 +66,7 @@ export {
   connect,
   createUser,
   findUserByCredentials,
+  getHabitsByUsername,
   createHabit,
   deleteHabit,
   updateHabit,

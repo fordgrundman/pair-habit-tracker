@@ -70,6 +70,41 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.get("/habits", async (req, res) => {
+  const { username } = req.query;
+  if (!username || typeof username !== "string") {
+    return res.status(400).json({ message: "username is required" });
+  }
+
+  try {
+    const userHabits = await habits.getHabitsByUsername(username);
+    return res.status(200).json(userHabits);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "failed to fetch habits" });
+  }
+});
+
+app.post("/habits", async (req, res) => {
+  const { username, title, interval } = req.body ?? {};
+
+  if (!username || !title || !interval) {
+    return res
+      .status(400)
+      .json({ message: "username, title, and interval are required" });
+  }
+
+  try {
+    const habit = await habits.createHabit({ username, title, interval });
+    return res
+      .status(201)
+      .json({ id: habit._id, title: habit.title, interval: habit.interval });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "failed to create habit" });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, async () => {

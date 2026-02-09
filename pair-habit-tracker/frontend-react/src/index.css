@@ -15,7 +15,7 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #FED800;
+  background-color: #fed800;
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   flex-grow: 1;
   background-image: url("./assets/sticky_note-bg.png");
@@ -29,12 +29,20 @@ header {
   padding: 0;
 }
 
+main {
+  margin: 0 1rem;
+}
+
 footer {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, -50%);
   font-size: 0.8rem;
   margin: 1rem 0 0 0;
   padding: 0;
-  margin-top: auto;
   margin-bottom: 0.25rem;
+  width: 100%;
 }
 
 a {
@@ -52,7 +60,7 @@ nav a {
 }
 
 nav {
-  background-color: #DAC035;
+  background-color: #dac035;
   padding: 0.5rem;
   margin-bottom: 1rem;
 }
@@ -64,4 +72,95 @@ li {
 
 #emphasis-span {
   color: blue;
+}
+
+#tagline {
+  font-size: 1.5rem;
+}
+/* --------------------------------------------------Account Page Styles --------------------------------------------------*/
+#login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#login-buttons-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  justify-content: center;
+}
+/* -----------------------------------------Habits List Styles ----------------------------------------------------------*/
+.habits-list-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.habit-container {
+  display: flex;
+  height: 3rem;
+  justify-content: center;
+}
+
+.habit-inner-wrapper {
+  border: 0.1rem solid black;
+  width: 30rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 1rem;
+  margin-right: 0.5rem;
+}
+
+.habit-checkbox {
+  width: 3rem;
+}
+
+.habit-interval {
+  margin-left: auto;
+}
+
+.edit-icon {
+  width: 2.5rem;
+  background-image: url("./assets/edit-icon.png");
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.edit-icon:hover {
+  cursor: pointer;
+}
+
+.delete-icon {
+  width: 2.5rem;
+  background-image: url("./assets/delete-icon.png");
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.delete-icon:hover {
+  cursor: pointer;
+}
+
+/* ------------------------------------------------Add Habit Page --------------------------------------------------*/
+
+#add-habit-button {
+  width: 10rem;
+  height: 2.5rem;
+  font-size: 1rem;
+  background-color: #08eb08;
+  border: none;
+  border-radius: 0.2rem;
+  margin-bottom: 1rem;
+}
+
+#add-habit-button:hover {
+  background-color: #0eba0e;
+  cursor: pointer;
 }

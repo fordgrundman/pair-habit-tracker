@@ -73,22 +73,30 @@ function AccountPage() {
     <>
       <h1>Login</h1>
       <p>Currently logged in as: {cachedUsername}</p>
-      <label> Username: </label>
-      <input
-        type="text"
-        name="username"
-        value={username}
-        onChange={(event) => setUsername(event.target.value)}
-      />
-      <label> Password: </label>
-      <input
-        type="password"
-        name="password"
-        value={password}
-        onChange={(event) => setPassword(event.target.value)}
-      />
-      <button onClick={login}>Login</button>
-      <button onClick={signUp}>Create Account</button>
+      <div id="login-container">
+        <div className="login-field-wrapper">
+          <label> Username: </label>
+          <input
+            type="text"
+            name="username"
+            value={username}
+            onChange={(event) => setUsername(event.target.value)}
+          />
+        </div>
+        <div className="login-field-wrapper">
+          <label> Password: </label>
+          <input
+            type="password"
+            name="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+          />
+        </div>
+        <div id="login-buttons-wrapper">
+          <button onClick={login}>Login</button>
+          <button onClick={signUp}>Create Account</button>
+        </div>
+      </div>
     </>
   );
 }

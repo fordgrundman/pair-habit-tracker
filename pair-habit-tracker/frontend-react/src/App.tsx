@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Help from "./pages/Help";
 import HabitsList from "./pages/HabitsList";
 import AccountPage from "./pages/AccountPage";
+import AddHabit from "./pages/AddHabit";
 
 function App() {
   return (
@@ -10,18 +11,22 @@ function App() {
       <header>
         <nav>
           <Link to="/account">Account</Link>
-          <Link to="/">Habits List</Link>
+          <Link to="/habits">Habits List</Link>
           <Link to="/help">Help</Link>
         </nav>
       </header>
       <main>
         <Routes>
           <Route path="account" element={<AccountPage />} />
-          <Route path="/" element={<HabitsList />} />
+          <Route path="/habits" element={<HabitsList />} />
+          <Route path="/add-habit" element={<AddHabit />} />
           <Route path="/help" element={<Help />} />
         </Routes>
       </main>
-      <footer>© Ford Grundman</footer>
+      <footer>
+        <div id="tagline">Track your habits to stay consistent</div>
+        <p>© Ford Grundman</p>
+      </footer>
     </Router>
   );
 }
