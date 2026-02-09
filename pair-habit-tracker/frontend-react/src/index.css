@@ -186,10 +186,8 @@ li {
 .habit-input-wrapper {
   display: flex;
   flex-direction: row;
-  justify-content: center;
   align-items: center;
   gap: 0.5rem;
-  margin-left: 32.5%;
 }
 
 .habit-input-buttons-wrapper {
@@ -219,21 +217,26 @@ li {
   background-color: #0eba0e;
 }
 
-.habit-inputs-container {
+.habit-inputs-outer-container {
+  display: flex;
+  justify-content: center;
+}
+
+.habit-inputs-inner-container {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   align-items: flex-start;
 }
 
-.habit-inputs-container label {
+.habit-inputs-inner-container label {
   font-size: 1.2rem;
   width: 7rem;
   text-align: right;
 }
 
-.habit-inputs-container input,
-.habit-inputs-container select {
+.habit-inputs-inner-container input,
+.habit-inputs-inner-container select {
   font-size: 1.1rem;
   padding: 0.4rem 0.6rem;
   height: 2.2rem;

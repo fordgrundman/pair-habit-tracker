@@ -43,26 +43,28 @@ function AddHabit() {
   return (
     <>
       <h1>Add Habit</h1>
-      <div className="habit-inputs-container">
-        <div className="habit-input-wrapper">
-          <label className="title-input-label">Title: </label>
-          <input
-            type="text"
-            id="habit-title-input"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-          />
-        </div>
-        <div className="habit-input-wrapper">
-          <label className="interval-input-label">Interval: </label>
-          <select
-            id="habit-interval-select"
-            value={interval}
-            onChange={(event) => setInterval(event.target.value)}
-          >
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-          </select>
+      <div className="habit-inputs-outer-container">
+        <div className="habit-inputs-inner-container">
+          <div className="habit-input-wrapper">
+            <label className="title-input-label">Title: </label>
+            <input
+              type="text"
+              id="habit-title-input"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+            />
+          </div>
+          <div className="habit-input-wrapper">
+            <label className="interval-input-label">Interval: </label>
+            <select
+              id="habit-interval-select"
+              value={interval}
+              onChange={(event) => setInterval(event.target.value)}
+            >
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+            </select>
+          </div>
         </div>
       </div>
       <div className="habit-input-buttons-wrapper">
