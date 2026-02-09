@@ -32,7 +32,7 @@ app.use(
   }),
 );
 
-app.post("/account", async (req, res) => {
+app.post("/signup", async (req, res) => {
   const { username, password } = req.body ?? {};
 
   if (!username || !password) {
