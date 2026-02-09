@@ -2,5 +2,8 @@
   "dependencies": {
     "express": "^5.2.1",
     "mongoose": "^9.1.6"
+  },
+  "scripts": {
+    "start": "node habit-controller.js"
   }
 }
