@@ -42,6 +42,31 @@ function HabitsList() {
     void fetchHabits();
   }, [cachedUsername]);
 
+  const deleteHabit = async (id: string) => {
+    try {
+      const response = await fetch(
+        `https://pair-habit-tracker.onrender.com/habits/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        },
+      );
+      alert("response status = " + response.status);
+      if (response.status !== 204) {
+        return;
+      }
+
+      setUserHabits((prevHabits) =>
+        prevHabits.filter((habit) => habit._id !== id),
+      );
+    } catch (error) {
+      console.error("Failed to delete habit", error);
+    }
+  };
+
   return (
     <>
       <h1>Habits List</h1>
@@ -52,9 +77,11 @@ function HabitsList() {
       <div className="habits-list-container">
         {userHabits.map((habit) => (
           <Habit
-            key={`${habit.title}-${habit.interval}`}
+            key={habit._id}
+            _id={habit._id}
             title={habit.title}
             interval={habit.interval}
+            onDelete={deleteHabit}
           />
         ))}
       </div>

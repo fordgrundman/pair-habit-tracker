@@ -1,20 +1,13 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 function AccountPage() {
-  const [cachedUsername, setCachedUsername] = useState("");
+  const [cachedUsername, setCachedUsername] = useState(
+    () => localStorage.getItem("username") ?? "",
+  );
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const savedUsername = localStorage.getItem("username");
-
-    // simply save the username in local storage, for barebones temporary login system until microservice
-    if (savedUsername) {
-      setCachedUsername(savedUsername);
-    }
-  }, []);
 
   const signUp = async () => {
     const newAccount = { username, password };
@@ -34,9 +27,10 @@ function AccountPage() {
     if (response.status === 201) {
       alert("Successfully created the account");
       localStorage.setItem("username", username);
+      setCachedUsername(username);
 
       //only navigate to Habits List after successful signup
-      navigate("/");
+      navigate("/habits");
     } else {
       alert("Failed to create account, status code = " + response.status);
     }
@@ -61,9 +55,10 @@ function AccountPage() {
     if (response.status === 200) {
       alert("Successfully logged in");
       localStorage.setItem("username", username);
+      setCachedUsername(username);
 
       //only navigate to Habits List after successful login
-      navigate("/");
+      navigate("/habits");
     } else {
       alert("Failed to log in, status code = " + response.status);
     }

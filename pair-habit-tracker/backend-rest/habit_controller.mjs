@@ -105,6 +105,27 @@ app.post("/habits", async (req, res) => {
   }
 });
 
+app.delete("/habits/:id", async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(400).json({ message: "habit id is required" });
+  }
+
+  try {
+    const deletedHabit = await habits.deleteHabit(id);
+
+    if (!deletedHabit) {
+      return res.status(404).json({ message: "habit not found" });
+    }
+
+    return res.status(204).send();
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "failed to delete habit" });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, async () => {

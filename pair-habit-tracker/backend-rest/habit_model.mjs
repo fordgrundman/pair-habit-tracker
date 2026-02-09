@@ -59,7 +59,9 @@ async function createHabit({ username, title, interval }) {
   const habit = new Habit({ username, title, interval });
   return await habit.save();
 }
-async function deleteHabit() {}
+async function deleteHabit(id) {
+  return await Habit.findByIdAndDelete(id).exec();
+}
 async function updateHabit() {}
 
 export {

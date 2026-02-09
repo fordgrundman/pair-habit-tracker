@@ -1,18 +1,13 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function AddHabit() {
-  const [cachedUsername, setCachedUsername] = useState("");
+  const [cachedUsername] = useState(
+    () => localStorage.getItem("username") ?? "",
+  );
   const [title, setTitle] = useState("");
   const [interval, setInterval] = useState("daily");
-
-  useEffect(() => {
-    const savedUsername = localStorage.getItem("username");
-
-    // simply save the username in local storage, for barebones temporary login system until microservice
-    if (savedUsername) {
-      setCachedUsername(savedUsername);
-    }
-  }, []);
+  const navigate = useNavigate();
 
   const requestHabitCreation = async () => {
     if (!cachedUsername || !title) {
@@ -39,6 +34,7 @@ function AddHabit() {
 
     if (response.status === 201) {
       alert("Successfully created the habit");
+      navigate("/habits");
     } else {
       alert("Failed to create habit, status code = " + response.status);
     }
