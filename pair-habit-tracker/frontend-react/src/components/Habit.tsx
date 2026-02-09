@@ -2,17 +2,31 @@ export type HabitType = {
   _id: string;
   title: string;
   interval: "daily" | "weekly";
+  completed: boolean;
 };
 
-//pass in onDelete as well as a prop, and make a new type that extens HabitType to make typescript happy
+//pass in onDelete and onToggleCompleted as well as a prop, and make a new type that extens HabitType to make typescript happy
 type HabitProps = HabitType & {
   onDelete: (id: string) => void;
+  onToggleCompleted: (id: string, completed: boolean) => void;
 };
 
-function Habit({ _id, title, interval, onDelete }: HabitProps) {
+function Habit({
+  _id,
+  title,
+  interval,
+  completed,
+  onDelete,
+  onToggleCompleted,
+}: HabitProps) {
   return (
     <div className="habit-container">
-      <input className="habit-checkbox" type="checkbox" />
+      <input
+        className="habit-checkbox"
+        type="checkbox"
+        checked={completed}
+        onChange={(event) => onToggleCompleted(_id, event.target.checked)}
+      />
       <div className="habit-inner-wrapper">
         <div className="habit-title">{title}</div>
         <div className="habit-interval">{interval}</div>

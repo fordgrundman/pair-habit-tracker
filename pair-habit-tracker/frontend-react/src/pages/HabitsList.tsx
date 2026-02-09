@@ -54,7 +54,6 @@ function HabitsList() {
           credentials: "include",
         },
       );
-      alert("response status = " + response.status);
       if (response.status !== 204) {
         return;
       }
@@ -64,6 +63,34 @@ function HabitsList() {
       );
     } catch (error) {
       console.error("Failed to delete habit", error);
+    }
+  };
+
+  const toggleCompleted = async (id: string, completed: boolean) => {
+    try {
+      const response = await fetch(
+        `https://pair-habit-tracker.onrender.com/habits/${id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ completed }),
+        },
+      );
+
+      if (!response.ok) {
+        return;
+      }
+
+      setUserHabits((prevHabits) =>
+        prevHabits.map((habit) =>
+          habit._id === id ? { ...habit, completed } : habit,
+        ),
+      );
+    } catch (error) {
+      console.error("Failed to update habit", error);
     }
   };
 
@@ -81,7 +108,9 @@ function HabitsList() {
             _id={habit._id}
             title={habit.title}
             interval={habit.interval}
+            completed={habit.completed}
             onDelete={deleteHabit}
+            onToggleCompleted={toggleCompleted}
           />
         ))}
       </div>

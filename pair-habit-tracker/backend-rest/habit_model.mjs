@@ -22,6 +22,7 @@ const habitSchema = new mongoose.Schema(
       required: true,
       enum: ["daily", "weekly"],
     },
+    completed: { type: Boolean, required: true, default: false },
   },
   { timestamps: true },
 );
@@ -55,14 +56,16 @@ async function getHabitsByUsername(username) {
   return await Habit.find({ username }).exec();
 }
 
-async function createHabit({ username, title, interval }) {
-  const habit = new Habit({ username, title, interval });
+async function createHabit({ username, title, interval, completed }) {
+  const habit = new Habit({ username, title, interval, completed });
   return await habit.save();
 }
 async function deleteHabit(id) {
   return await Habit.findByIdAndDelete(id).exec();
 }
-async function updateHabit() {}
+async function updateHabit(id, updates) {
+  return await Habit.findByIdAndUpdate(id, updates, { new: true }).exec();
+}
 
 export {
   connect,

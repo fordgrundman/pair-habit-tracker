@@ -86,7 +86,7 @@ app.get("/habits", async (req, res) => {
 });
 
 app.post("/habits", async (req, res) => {
-  const { username, title, interval } = req.body ?? {};
+  const { username, title, interval, completed } = req.body ?? {};
 
   if (!username || !title || !interval) {
     return res
@@ -95,13 +95,54 @@ app.post("/habits", async (req, res) => {
   }
 
   try {
-    const habit = await habits.createHabit({ username, title, interval });
+    const habit = await habits.createHabit({
+      username,
+      title,
+      interval,
+      completed,
+    });
     return res
       .status(201)
-      .json({ id: habit._id, title: habit.title, interval: habit.interval });
+      .json({
+        id: habit._id,
+        title: habit.title,
+        interval: habit.interval,
+        completed: habit.completed,
+      });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "failed to create habit" });
+  }
+});
+
+app.patch("/habits/:id", async (req, res) => {
+  const { id } = req.params;
+  const { completed } = req.body ?? {};
+
+  if (!id) {
+    return res.status(400).json({ message: "habit id is required" });
+  }
+
+  if (typeof completed !== "boolean") {
+    return res.status(400).json({ message: "completed must be boolean" });
+  }
+
+  try {
+    const updatedHabit = await habits.updateHabit(id, { completed });
+
+    if (!updatedHabit) {
+      return res.status(404).json({ message: "habit not found" });
+    }
+
+    return res.status(200).json({
+      id: updatedHabit._id,
+      title: updatedHabit.title,
+      interval: updatedHabit.interval,
+      completed: updatedHabit.completed,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "failed to update habit" });
   }
 });
 

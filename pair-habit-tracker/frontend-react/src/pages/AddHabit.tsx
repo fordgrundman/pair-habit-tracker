@@ -18,6 +18,7 @@ function AddHabit() {
       username: cachedUsername,
       title,
       interval,
+      completed: false,
     };
 
     const response = await fetch(
