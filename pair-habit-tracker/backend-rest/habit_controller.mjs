@@ -115,20 +115,53 @@ app.post("/habits", async (req, res) => {
   }
 });
 
-app.patch("/habits/:id", async (req, res) => {
+app.get("/habits/:id", async (req, res) => {
   const { id } = req.params;
-  const { completed } = req.body ?? {};
 
   if (!id) {
     return res.status(400).json({ message: "habit id is required" });
   }
 
-  if (typeof completed !== "boolean") {
+  try {
+    const habit = await habits.getHabitById(id);
+
+    if (!habit) {
+      return res.status(404).json({ message: "habit not found" });
+    }
+
+    return res.status(200).json(habit);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "failed to fetch habit" });
+  }
+});
+
+app.patch("/habits/:id", async (req, res) => {
+  const { id } = req.params;
+  const { title, interval, completed } = req.body ?? {};
+
+  if (!id) {
+    return res.status(400).json({ message: "habit id is required" });
+  }
+
+  if (
+    typeof title === "undefined" &&
+    typeof interval === "undefined" &&
+    typeof completed === "undefined"
+  ) {
+    return res.status(400).json({ message: "no updates provided" });
+  }
+
+  if (typeof completed !== "undefined" && typeof completed !== "boolean") {
     return res.status(400).json({ message: "completed must be boolean" });
   }
 
   try {
-    const updatedHabit = await habits.updateHabit(id, { completed });
+    const updatedHabit = await habits.updateHabit(id, {
+      title,
+      interval,
+      completed,
+    });
 
     if (!updatedHabit) {
       return res.status(404).json({ message: "habit not found" });

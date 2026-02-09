@@ -56,6 +56,10 @@ async function getHabitsByUsername(username) {
   return await Habit.find({ username }).exec();
 }
 
+async function getHabitById(id) {
+  return await Habit.findById(id).exec();
+}
+
 async function createHabit({ username, title, interval, completed }) {
   const habit = new Habit({ username, title, interval, completed });
   return await habit.save();
@@ -72,6 +76,7 @@ export {
   createUser,
   findUserByCredentials,
   getHabitsByUsername,
+  getHabitById,
   createHabit,
   deleteHabit,
   updateHabit,

@@ -94,6 +94,11 @@ function HabitsList() {
     }
   };
 
+  const editHabit = (habit: HabitType) => {
+    localStorage.setItem("editHabit", JSON.stringify(habit));
+    navigate("/habits/edit");
+  };
+
   return (
     <>
       <h1>Habits List</h1>
@@ -111,6 +116,7 @@ function HabitsList() {
             completed={habit.completed}
             onDelete={deleteHabit}
             onToggleCompleted={toggleCompleted}
+            onEdit={editHabit}
           />
         ))}
       </div>

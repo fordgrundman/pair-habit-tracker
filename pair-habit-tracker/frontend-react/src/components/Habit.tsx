@@ -9,6 +9,7 @@ export type HabitType = {
 type HabitProps = HabitType & {
   onDelete: (id: string) => void;
   onToggleCompleted: (id: string, completed: boolean) => void;
+  onEdit: (habit: HabitType) => void;
 };
 
 function Habit({
@@ -18,6 +19,7 @@ function Habit({
   completed,
   onDelete,
   onToggleCompleted,
+  onEdit,
 }: HabitProps) {
   return (
     <div className="habit-container">
@@ -31,7 +33,12 @@ function Habit({
         <div className="habit-title">{title}</div>
         <div className="habit-interval">{interval}</div>
       </div>
-      <div className="edit-icon" />
+      <div className="edit-icon" onClick={() => onEdit({
+        _id,
+        title,
+        interval,
+        completed,
+      })} />
       <div
         className="delete-icon"
         onClick={() => {
