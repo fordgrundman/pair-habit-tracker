@@ -55,7 +55,15 @@ function AddHabit() {
             />
           </div>
           <div className="habit-input-wrapper">
-            <label className="interval-input-label">Interval: </label>
+            <label className="interval-input-label">
+              <span className="tooltip">
+                <span className="tooltip-icon">?</span>
+                <span className="tooltip-text">
+                  How often the habit needs to be completed to reach your goal.
+                </span>
+              </span>
+              Interval:
+            </label>
             <select
               id="habit-interval-select"
               value={interval}
