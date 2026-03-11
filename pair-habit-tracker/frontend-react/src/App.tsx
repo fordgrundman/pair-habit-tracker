@@ -11,6 +11,7 @@ import HabitsList from "./pages/HabitsList";
 import AccountPage from "./pages/AccountPage";
 import AddHabit from "./pages/AddHabit";
 import EditHabit from "./pages/EditHabit";
+import PairPage from "./pages/PairPage";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <nav>
           <Link to="/account">Account</Link>
           <Link to="/habits">Habits List</Link>
+          <Link to="/pair">Pair Page</Link>
           <Link to="/help">Help</Link>
         </nav>
       </header>
@@ -30,6 +32,7 @@ function App() {
           <Route path="/habits" element={<HabitsList />} />
           <Route path="/add-habit" element={<AddHabit />} />
           <Route path="/habits/edit" element={<EditHabit />} />
+          <Route path="/pair" element={<PairPage />} />
           <Route path="/help" element={<Help />} />
         </Routes>
       </main>

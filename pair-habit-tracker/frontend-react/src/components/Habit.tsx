@@ -3,9 +3,20 @@ export type HabitType = {
   title: string;
   interval: "daily" | "weekly";
   completed: boolean;
+  streak?: number;
+  pairedWithUsername?: string | null;
+  pairedWithHabitId?: string | null;
 };
 
-//pass in onDelete and onToggleCompleted as well as a prop, and make a new type that extens HabitType to make typescript happy
+export type PairPostType = {
+  _id: string;
+  habitId: string;
+  posterUsername: string;
+  title: string;
+  interval: "daily" | "weekly";
+};
+
+//props for the habits list
 type HabitProps = HabitType & {
   onDelete: (id: string) => void;
   onToggleCompleted: (id: string, completed: boolean) => void;
@@ -13,11 +24,15 @@ type HabitProps = HabitType & {
   intervalLabel?: string;
 };
 
+import streaksIcon from "../assets/streaks-icon.png";
+
 function Habit({
   _id,
   title,
   interval,
   completed,
+  streak,
+  pairedWithUsername,
   onDelete,
   onToggleCompleted,
   onEdit,
@@ -26,6 +41,10 @@ function Habit({
   const displayInterval = intervalLabel ?? interval;
   return (
     <div className="habit-container">
+      <div className="habit-streak" title="Current streak">
+        <img src={streaksIcon} alt="streak" className="streak-icon" />
+        {streak ?? 0}
+      </div>
       <input
         className="habit-checkbox"
         type="checkbox"
@@ -34,7 +53,15 @@ function Habit({
       />
       <div className="habit-inner-wrapper">
         <div className="habit-title">{title}</div>
-        <div className="habit-interval">{displayInterval}</div>
+        <div className="habit-interval">
+          {displayInterval}
+          {pairedWithUsername && (
+            <span className="habit-paired-label">
+              {" "}
+              · Paired with {pairedWithUsername}
+            </span>
+          )}
+        </div>
       </div>
       <div
         className="edit-icon"
@@ -55,7 +82,7 @@ function Habit({
           );
 
           if (shouldDelete) {
-            onDelete(_id); //delete the habit of this id
+            onDelete(_id);
           }
         }}
       />

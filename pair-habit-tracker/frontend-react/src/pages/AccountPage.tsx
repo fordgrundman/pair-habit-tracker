@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-//Auth Microservice configurations
+//auth microservice config
 const {
   VITE_AUTH_URL: BASE_URL,
   VITE_APP_ID: APP_ID,
   VITE_APP_SECRET: APP_SECRET,
 } = import.meta.env;
 
-//Record<string, string> needed to satisfy Vite fetch HeadersInit type for typescript
+//Record<string, string> for vite fetch HeadersInit type
 const HEADERS: Record<string, string> = {
   "Content-Type": "application/json",
   "X-App-Id": APP_ID,
@@ -38,7 +38,7 @@ function AccountPage() {
       localStorage.setItem("sessionId", data.sessionId);
       setCachedUsername(username);
 
-      //navigate to Habits List after successful signup
+      //go to habits list after signup
       navigate("/habits");
     } else if (response.status === 409) {
       alert("Username already exists. Please login instead.");
@@ -61,7 +61,7 @@ function AccountPage() {
       localStorage.setItem("sessionId", data.sessionId);
       setCachedUsername(username);
 
-      //navigate to Habits List after successful login
+      //go to habits list after login
       navigate("/habits");
     } else {
       alert("Login failed. Incorrect username or password");

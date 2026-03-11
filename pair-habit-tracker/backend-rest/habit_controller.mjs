@@ -18,16 +18,13 @@ app.use(
   }),
 );
 
-//Auth microservice settings
+//auth microservice settings
 const AUTH_URL = process.env.AUTH_URL || "http://127.0.0.1:5000";
 const APP_ID = process.env.APP_ID || "";
 const APP_SECRET = process.env.APP_SECRET || "";
 
-/*
- *Validate  session using auth microservice /introspect endpoint
- *expects frontend to send an "X-Session-Id" header with sessionId
- *on success attaches req.userId and req.appId
- */
+//validates session via auth microservice introspect endpoint
+//expects X-Session-Id header, attaches req.userId and req.appId on success
 async function requireAuth(req, res, next) {
   const sessionId = req.headers["x-session-id"] || "";
   if (!sessionId) {
@@ -147,6 +144,20 @@ app.patch("/habits/:id", requireAuth, async (req, res) => {
   }
 
   try {
+    //if only toggling completed, use streak-aware logic
+    if (
+      typeof completed !== "undefined" &&
+      typeof title === "undefined" &&
+      typeof interval === "undefined"
+    ) {
+      const updatedHabit = await habits.toggleCompletion(id, completed);
+      if (!updatedHabit) {
+        return res.status(404).json({ message: "habit not found" });
+      }
+      return res.status(200).json(updatedHabit);
+    }
+
+    //otherwise just update the fields normally
     const updatedHabit = await habits.updateHabit(id, {
       title,
       interval,
@@ -157,12 +168,7 @@ app.patch("/habits/:id", requireAuth, async (req, res) => {
       return res.status(404).json({ message: "habit not found" });
     }
 
-    return res.status(200).json({
-      id: updatedHabit._id,
-      title: updatedHabit.title,
-      interval: updatedHabit.interval,
-      completed: updatedHabit.completed,
-    });
+    return res.status(200).json(updatedHabit);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "failed to update habit" });
@@ -187,6 +193,116 @@ app.delete("/habits/:id", requireAuth, async (req, res) => {
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "failed to delete habit" });
+  }
+});
+
+//pair board routes
+
+app.get("/pair-posts", requireAuth, async (req, res) => {
+  try {
+    const posts = await habits.getAllPairPosts();
+    return res.status(200).json(posts);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "failed to fetch pair posts" });
+  }
+});
+
+//post a habit to the pair board
+app.post("/pair-posts", requireAuth, async (req, res) => {
+  const { habitId } = req.body ?? {};
+
+  if (!habitId) {
+    return res.status(400).json({ message: "habitId is required" });
+  }
+
+  try {
+    const habit = await habits.getHabitById(habitId);
+    if (!habit) {
+      return res.status(404).json({ message: "habit not found" });
+    }
+
+    const post = await habits.createPairPost({
+      habitId: habit._id,
+      posterUsername: habit.username,
+      title: habit.title,
+      interval: habit.interval,
+    });
+
+    return res.status(201).json(post);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "failed to create pair post" });
+  }
+});
+
+//unpost a pair post
+app.delete("/pair-posts/:id", requireAuth, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const post = await habits.getPairPostById(id);
+    if (!post) {
+      return res.status(404).json({ message: "pair post not found" });
+    }
+
+    await habits.deletePairPost(id);
+    return res.status(204).send();
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "failed to delete pair post" });
+  }
+});
+
+//pair with a posted habit
+app.post("/pair-posts/:id/pair", requireAuth, async (req, res) => {
+  const { id } = req.params;
+  const { username } = req.body ?? {};
+
+  if (!username) {
+    return res.status(400).json({ message: "username is required" });
+  }
+
+  try {
+    const result = await habits.pairWithPost(id, username);
+
+    if (result.error === "post_not_found") {
+      return res.status(404).json({ message: "pair post not found" });
+    }
+    if (result.error === "cannot_pair_self") {
+      return res
+        .status(400)
+        .json({ message: "You cannot pair with your own habit" });
+    }
+    if (result.error === "original_habit_deleted") {
+      return res
+        .status(410)
+        .json({ message: "The original habit was deleted" });
+    }
+
+    return res.status(200).json({
+      claimerHabit: result.claimerHabit,
+      originalHabit: result.originalHabit,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "failed to pair" });
+  }
+});
+
+//get habits the user is paired on
+app.get("/my-pairings", requireAuth, async (req, res) => {
+  const { username } = req.query;
+  if (!username || typeof username !== "string") {
+    return res.status(400).json({ message: "username is required" });
+  }
+
+  try {
+    const paired = await habits.getPairedHabits(username);
+    return res.status(200).json(paired);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "failed to fetch pairings" });
   }
 });
 

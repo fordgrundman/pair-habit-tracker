@@ -11,7 +11,7 @@ function HabitsList() {
   );
   const navigate = useNavigate();
 
-  //Build headers that include auth session id
+  //build headers with auth session id
   const getHeaders = () => {
     const sessionId = localStorage.getItem("sessionId") ?? "";
     return {
@@ -20,7 +20,7 @@ function HabitsList() {
     };
   };
 
-  //Get username from local storage, then fetch habits for the user
+  //fetch habits for the logged in user
   useEffect(() => {
     if (!cachedUsername) {
       return;
@@ -80,9 +80,16 @@ function HabitsList() {
         return;
       }
 
+      const updatedHabit = await response.json();
       setUserHabits((prevHabits) =>
         prevHabits.map((habit) =>
-          habit._id === id ? { ...habit, completed } : habit,
+          habit._id === id
+            ? {
+                ...habit,
+                completed: updatedHabit.completed,
+                streak: updatedHabit.streak,
+              }
+            : habit,
         ),
       );
     } catch (error) {
@@ -112,8 +119,11 @@ function HabitsList() {
             _id={habit._id}
             title={habit.title}
             interval={habit.interval}
-            intervalLabel={`${habit.interval[0].toUpperCase()}${habit.interval.slice(1)}`} //capitalize "daily" to "Daily", "weekly" to "Weekly"
+            intervalLabel={`${habit.interval[0].toUpperCase()}${habit.interval.slice(1)}`}
             completed={habit.completed}
+            streak={habit.streak}
+            pairedWithUsername={habit.pairedWithUsername}
+            pairedWithHabitId={habit.pairedWithHabitId}
             onDelete={deleteHabit}
             onToggleCompleted={toggleCompleted}
             onEdit={editHabit}
