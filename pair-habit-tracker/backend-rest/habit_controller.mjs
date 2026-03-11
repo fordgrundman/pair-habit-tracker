@@ -1,7 +1,6 @@
 import "dotenv/config";
 import cors from "cors";
 import express from "express";
-import session from "express-session";
 import * as habits from "./habit_model.mjs";
 
 const app = express();
@@ -19,58 +18,51 @@ app.use(
   }),
 );
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "devSecret",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-    },
-  }),
-);
+//Auth microservice settings
+const AUTH_URL = process.env.AUTH_URL || "http://127.0.0.1:5000";
+const APP_ID = process.env.APP_ID || "";
+const APP_SECRET = process.env.APP_SECRET || "";
 
-app.post("/signup", async (req, res) => {
-  const { username, password } = req.body ?? {};
-
-  if (!username || !password) {
-    return res.status(400).json({ message: "username and password required" });
+/*
+ *Validate  session using auth microservice /introspect endpoint
+ *expects frontend to send an "X-Session-Id" header with sessionId
+ *on success attaches req.userId and req.appId
+ */
+async function requireAuth(req, res, next) {
+  const sessionId = req.headers["x-session-id"] || "";
+  if (!sessionId) {
+    return res.status(401).json({ message: "Missing X-Session-Id header" });
   }
 
   try {
-    const user = await habits.createUser({ username, password });
-    return res.status(201).json({ id: user._id, username: user.username });
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({ message: "failed to create account" });
-  }
-});
+    const introspectRes = await fetch(`${AUTH_URL}/introspect`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-App-Id": APP_ID,
+        "X-App-Secret": APP_SECRET,
+      },
+      body: JSON.stringify({ sessionId }),
+    });
 
-app.post("/login", async (req, res) => {
-  const { username, password } = req.body ?? {};
+    const data = await introspectRes.json();
 
-  if (!username || !password) {
-    return res.status(400).json({ message: "username and password required" });
-  }
-
-  try {
-    const user = await habits.findUserByCredentials({ username, password });
-
-    if (!user) {
-      return res.status(401).json({ message: "invalid credentials" });
+    if (!data.active) {
+      return res
+        .status(401)
+        .json({ message: "Session is not active. Please log in again." });
     }
 
-    req.session.userId = user._id.toString();
-    return res.status(200).json({ id: user._id, username: user.username });
+    req.userId = data.userId;
+    req.appId = data.appId;
+    next();
   } catch (err) {
-    console.log(err);
-    return res.status(500).json({ message: "login failed" });
+    console.error("Auth introspect failed:", err);
+    return res.status(502).json({ message: "Auth service unavailable" });
   }
-});
+}
 
-app.get("/habits", async (req, res) => {
+app.get("/habits", requireAuth, async (req, res) => {
   const { username } = req.query;
   if (!username || typeof username !== "string") {
     return res.status(400).json({ message: "username is required" });
@@ -85,7 +77,7 @@ app.get("/habits", async (req, res) => {
   }
 });
 
-app.post("/habits", async (req, res) => {
+app.post("/habits", requireAuth, async (req, res) => {
   const { username, title, interval, completed } = req.body ?? {};
 
   if (!username || !title || !interval) {
@@ -101,21 +93,19 @@ app.post("/habits", async (req, res) => {
       interval,
       completed,
     });
-    return res
-      .status(201)
-      .json({
-        id: habit._id,
-        title: habit.title,
-        interval: habit.interval,
-        completed: habit.completed,
-      });
+    return res.status(201).json({
+      id: habit._id,
+      title: habit.title,
+      interval: habit.interval,
+      completed: habit.completed,
+    });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "failed to create habit" });
   }
 });
 
-app.get("/habits/:id", async (req, res) => {
+app.get("/habits/:id", requireAuth, async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
@@ -136,7 +126,7 @@ app.get("/habits/:id", async (req, res) => {
   }
 });
 
-app.patch("/habits/:id", async (req, res) => {
+app.patch("/habits/:id", requireAuth, async (req, res) => {
   const { id } = req.params;
   const { title, interval, completed } = req.body ?? {};
 
@@ -179,7 +169,7 @@ app.patch("/habits/:id", async (req, res) => {
   }
 });
 
-app.delete("/habits/:id", async (req, res) => {
+app.delete("/habits/:id", requireAuth, async (req, res) => {
   const { id } = req.params;
 
   if (!id) {

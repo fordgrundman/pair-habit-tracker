@@ -68,6 +68,34 @@ function AccountPage() {
     }
   };
 
+  const logout = async () => {
+    const sessionId = localStorage.getItem("sessionId") ?? "";
+    if (!sessionId) {
+      alert("No active session.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${BASE_URL}/logout`, {
+        method: "POST",
+        headers: HEADERS,
+        body: JSON.stringify({ sessionId }),
+      });
+
+      if (response.ok) {
+        localStorage.removeItem("username");
+        localStorage.removeItem("sessionId");
+        setCachedUsername("");
+        setUsername("");
+        setPassword("");
+      } else {
+        alert("Logout failed.");
+      }
+    } catch {
+      alert("Logout request failed.");
+    }
+  };
+
   return (
     <>
       <h1>Account</h1>
@@ -102,6 +130,11 @@ function AccountPage() {
           <button className="habit-input-button" onClick={signUp}>
             Create Account
           </button>
+          {cachedUsername && (
+            <button className="habit-input-button" onClick={logout}>
+              Logout
+            </button>
+          )}
         </div>
       </div>
     </>

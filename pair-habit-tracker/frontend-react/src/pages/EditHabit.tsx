@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { type HabitType } from "../components/Habit";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function EditHabit() {
   const navigate = useNavigate();
   const storedHabit = localStorage.getItem("editHabit");
@@ -23,17 +25,15 @@ function EditHabit() {
       return;
     }
 
-    const response = await fetch(
-      `https://pair-habit-tracker.onrender.com/habits/${habitId}`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ title, interval, completed }),
+    const sessionId = localStorage.getItem("sessionId") ?? "";
+    const response = await fetch(`${API_URL}/habits/${habitId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Session-Id": sessionId,
       },
-    );
+      body: JSON.stringify({ title, interval, completed }),
+    });
 
     if (response.ok) {
       localStorage.removeItem("editHabit");

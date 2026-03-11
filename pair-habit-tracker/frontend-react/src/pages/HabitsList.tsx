@@ -2,6 +2,8 @@ import Habit, { type HabitType } from "../components/Habit";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function HabitsList() {
   const [userHabits, setUserHabits] = useState<HabitType[]>([]);
   const [cachedUsername] = useState(
@@ -9,7 +11,16 @@ function HabitsList() {
   );
   const navigate = useNavigate();
 
-  // Get username from local storage, then fetch habits for the user
+  //Build headers that include auth session id
+  const getHeaders = () => {
+    const sessionId = localStorage.getItem("sessionId") ?? "";
+    return {
+      "Content-Type": "application/json",
+      "X-Session-Id": sessionId,
+    };
+  };
+
+  //Get username from local storage, then fetch habits for the user
   useEffect(() => {
     if (!cachedUsername) {
       return;
@@ -18,13 +29,10 @@ function HabitsList() {
     const fetchHabits = async () => {
       try {
         const response = await fetch(
-          `https://pair-habit-tracker.onrender.com/habits?username=${cachedUsername}`,
+          `${API_URL}/habits?username=${cachedUsername}`,
           {
             method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
+            headers: getHeaders(),
           },
         );
 
@@ -44,16 +52,10 @@ function HabitsList() {
 
   const deleteHabit = async (id: string) => {
     try {
-      const response = await fetch(
-        `https://pair-habit-tracker.onrender.com/habits/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        },
-      );
+      const response = await fetch(`${API_URL}/habits/${id}`, {
+        method: "DELETE",
+        headers: getHeaders(),
+      });
       if (response.status !== 204) {
         return;
       }
@@ -68,17 +70,11 @@ function HabitsList() {
 
   const toggleCompleted = async (id: string, completed: boolean) => {
     try {
-      const response = await fetch(
-        `https://pair-habit-tracker.onrender.com/habits/${id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({ completed }),
-        },
-      );
+      const response = await fetch(`${API_URL}/habits/${id}`, {
+        method: "PATCH",
+        headers: getHeaders(),
+        body: JSON.stringify({ completed }),
+      });
 
       if (!response.ok) {
         return;

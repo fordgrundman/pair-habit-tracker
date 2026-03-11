@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function AddHabit() {
   const [cachedUsername] = useState(
     () => localStorage.getItem("username") ?? "",
@@ -21,17 +23,15 @@ function AddHabit() {
       completed: false,
     };
 
-    const response = await fetch(
-      "https://pair-habit-tracker.onrender.com/habits",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(newHabit),
+    const sessionId = localStorage.getItem("sessionId") ?? "";
+    const response = await fetch(`${API_URL}/habits`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Session-Id": sessionId,
       },
-    );
+      body: JSON.stringify(newHabit),
+    });
 
     if (response.status === 201) {
       navigate("/habits");

@@ -3,16 +3,6 @@ import mongoose from "mongoose";
 let connection = undefined;
 const HABIT_TRACKER_DB_NAME = "user-db";
 
-const userSchema = new mongoose.Schema(
-  {
-    username: { type: String, required: true, unique: true, trim: true },
-    password: { type: String, required: true },
-  },
-  { timestamps: true },
-);
-
-const User = mongoose.model("User", userSchema);
-
 const habitSchema = new mongoose.Schema(
   {
     username: { type: String, required: true, index: true, trim: true },
@@ -43,15 +33,6 @@ async function connect() {
   }
 }
 
-async function createUser({ username, password }) {
-  const user = new User({ username, password });
-  return await user.save();
-}
-
-async function findUserByCredentials({ username, password }) {
-  return await User.findOne({ username, password }).exec();
-}
-
 async function getHabitsByUsername(username) {
   return await Habit.find({ username }).exec();
 }
@@ -73,8 +54,6 @@ async function updateHabit(id, updates) {
 
 export {
   connect,
-  createUser,
-  findUserByCredentials,
   getHabitsByUsername,
   getHabitById,
   createHabit,
