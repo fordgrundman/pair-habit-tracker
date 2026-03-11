@@ -10,7 +10,7 @@ const {
 
 // ecord<string, string> needed to satisfy Vite fetch HeadersInit type for typescript
 const HEADERS: Record<string, string> = {
-  "Content-Type": "application/json",
+  // "Content-Type": "application/json",
   "X-App-Id": APP_ID,
   "X-App-Secret": APP_SECRET,
 };
