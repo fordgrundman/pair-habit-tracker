@@ -9,7 +9,7 @@ const {
 } = import.meta.env;
 
 //Record<string, string> for vite fetch HeadersInit type
-const HEADERS: Record<string, string> = {
+const HEADERS = {
   "Content-Type": "application/json",
   "X-App-Id": APP_ID,
   "X-App-Secret": APP_SECRET,
