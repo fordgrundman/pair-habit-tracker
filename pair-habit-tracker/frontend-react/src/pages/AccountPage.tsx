@@ -26,11 +26,14 @@ function AccountPage() {
 
   const signUp = async () => {
     const signupPayload = { username: username, password: password };
+    console.log(signupPayload);
     const response = await fetch(`${BASE_URL}/signup`, {
       method: "POST",
       headers: HEADERS,
       body: JSON.stringify(signupPayload),
     });
+
+    console.log(JSON.stringify(response));
 
     if (response.status === 201) {
       const data = await response.json();
