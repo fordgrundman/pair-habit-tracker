@@ -370,6 +370,10 @@ li {
   flex-shrink: 0;
   word-break: break-word;
   margin-right: 0.5rem;
+  margin-left: 1rem;
+}
+
+.pair-post-container {
 }
 
 .unpost-button,
