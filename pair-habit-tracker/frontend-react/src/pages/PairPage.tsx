@@ -224,7 +224,10 @@ function PairPage() {
           <h2>My Pairings</h2>
           <div className="habits-list-container">
             {myPairings.map((habit) => (
-              <div key={habit._id} className="habit-container">
+              <div
+                key={habit._id}
+                className="habit-container my-pairings-habit-container"
+              >
                 <div className="habit-streak" title="Current streak">
                   <img src={streaksIcon} alt="streak" className="streak-icon" />
                   {habit.streak ?? 0}

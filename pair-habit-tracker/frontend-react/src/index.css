@@ -131,6 +131,7 @@ li {
 }
 
 .habit-container {
+  position: relative;
   display: flex;
   min-height: 3rem;
   justify-content: center;
@@ -138,6 +139,8 @@ li {
 }
 
 .habit-streak {
+  position: absolute;
+  left: -6rem;
   display: flex;
   align-items: center;
   gap: 0.25rem;
@@ -175,6 +178,8 @@ li {
 }
 
 .habit-checkbox {
+  position: absolute;
+  left: -3rem;
   width: 2rem;
   height: 2rem;
   margin-right: 1rem;
@@ -187,6 +192,8 @@ li {
 }
 
 .edit-icon {
+  position: absolute;
+  right: -3rem;
   width: 2.5rem;
   height: 2.5rem;
   background-image: url("./assets/edit-icon.png");
@@ -200,6 +207,8 @@ li {
 }
 
 .delete-icon {
+  position: absolute;
+  right: -6rem;
   width: 2.5rem;
   height: 2.5rem;
   background-image: url("./assets/delete-icon.png");
@@ -350,6 +359,9 @@ li {
   margin-bottom: 1rem;
 }
 
+.my-pairings-habit-container {
+}
+
 .post-habit-option {
   display: flex;
   align-items: center;
@@ -361,20 +373,25 @@ li {
 }
 
 .pair-post-username {
+  position: absolute;
+  left: -9rem;
   color: blue;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-end;
+  justify-content: flex-end;
   text-align: center;
-  width: 4rem;
+  width: 7rem;
+  margin-right: 1rem;
   flex-shrink: 0;
   word-break: break-word;
-  margin-right: 0.5rem;
   margin-left: 1rem;
 }
 
+.unpair-button,
 .unpost-button,
 .pair-button {
+  position: absolute;
+  right: -5rem;
   width: 5rem;
   height: 2.25rem;
   flex-shrink: 0;
@@ -382,6 +399,7 @@ li {
   display: flex;
   align-items: center;
   justify-content: center;
+  align-self: center;
 }
 
 /* ------------------------------------------------ Holiday Banner --------------------------------------------------*/
