@@ -162,33 +162,34 @@ async function unpairHabit(id) {
     return { error: "habit_not_paired" };
   }
 
-  const partnerId = habit.pairedWithHabitId;
-
-  habit.pairedWithHabitId = null;
-  habit.pairedWithUsername = null;
-  await habit.save();
-
-  const partner = await Habit.findById(partnerId).exec();
-  if (partner) {
-    partner.pairedWithHabitId = null;
-    partner.pairedWithUsername = null;
-    await partner.save();
+  const partner = await Habit.findById(habit.pairedWithHabitId).exec();
+  if (!partner) {
+    await PairPost.deleteMany({ habitId: id });
+    await Habit.findByIdAndDelete(id).exec();
+    return { deletedHabitId: id, repostedPost: null };
   }
 
-  const existingPost = await PairPost.findOne({ habitId: habit._id }).exec();
+  partner.pairedWithHabitId = null;
+  partner.pairedWithUsername = null;
+  await partner.save();
+
+  await PairPost.deleteMany({ habitId: id });
+  await Habit.findByIdAndDelete(id).exec();
+
+  const existingPost = await PairPost.findOne({ habitId: partner._id }).exec();
   if (existingPost) {
-    return { unpairedHabit: habit, repostedPost: existingPost };
+    return { deletedHabitId: id, repostedPost: existingPost };
   }
 
   const repostedPost = new PairPost({
-    habitId: habit._id,
-    posterUsername: habit.username,
-    title: habit.title,
-    interval: habit.interval,
+    habitId: partner._id,
+    posterUsername: partner.username,
+    title: partner.title,
+    interval: partner.interval,
   });
   await repostedPost.save();
 
-  return { unpairedHabit: habit, repostedPost };
+  return { deletedHabitId: id, repostedPost };
 }
 
 async function updateHabit(id, updates) {

@@ -174,21 +174,7 @@ function PairPage() {
 
         // remove from pairings
         setMyPairings((prev) => prev.filter((p) => p._id !== id));
-
-        // keep the habit in my list, but unpaired
-        if (data.habit) {
-          setMyHabits((prev) => {
-            const updated = prev.map((h) =>
-              h._id === data.habit._id ? data.habit : h,
-            );
-
-            if (updated.some((h) => h._id === data.habit._id)) {
-              return updated;
-            }
-
-            return [data.habit, ...updated];
-          });
-        }
+        setMyHabits((prev) => prev.filter((h) => h._id !== id));
 
         if (data.repostedPost) {
           setPairPosts((prev) => {

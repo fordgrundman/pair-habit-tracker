@@ -344,7 +344,7 @@ app.post("/habits/:id/unpair", requireAuth, async (req, res) => {
     }
 
     return res.status(200).json({
-      habit: result.unpairedHabit,
+      id: result.deletedHabitId,
       repostedPost: result.repostedPost,
     });
   } catch (err) {
