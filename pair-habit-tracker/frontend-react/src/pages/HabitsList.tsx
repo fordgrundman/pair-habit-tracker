@@ -11,7 +11,7 @@ function HabitsList() {
   );
   const navigate = useNavigate();
 
-  //build headers with auth session id
+  //headers with session id
   const getHeaders = () => {
     const sessionId = localStorage.getItem("sessionId") ?? "";
     return {
@@ -20,7 +20,7 @@ function HabitsList() {
     };
   };
 
-  //fetch habits for the logged in user
+  //load the users habits
   useEffect(() => {
     if (!cachedUsername) {
       return;
@@ -127,6 +127,7 @@ function HabitsList() {
             onDelete={deleteHabit}
             onToggleCompleted={toggleCompleted}
             onEdit={editHabit}
+            showActions={!habit.pairedWithHabitId}
           />
         ))}
       </div>

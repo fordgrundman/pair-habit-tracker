@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-//auth microservice config
+//auth config
 const {
   VITE_AUTH_URL: BASE_URL,
   VITE_APP_ID: APP_ID,
   VITE_APP_SECRET: APP_SECRET,
+  VITE_RANDOM_USER_API_URL,
 } = import.meta.env;
 
-//Record<string, string> for vite fetch HeadersInit type
+//headers for auth requests
 const HEADERS = {
   "Content-Type": "application/json",
   "X-App-Id": APP_ID,
@@ -41,7 +42,7 @@ function AccountPage() {
       localStorage.setItem("sessionId", data.sessionId);
       setCachedUsername(username);
 
-      //go to habits list after signup
+      //send to habits list
       navigate("/habits");
     } else if (response.status === 409) {
       alert("Username already exists. Please login instead.");
@@ -64,7 +65,7 @@ function AccountPage() {
       localStorage.setItem("sessionId", data.sessionId);
       setCachedUsername(username);
 
-      //go to habits list after login
+      //send to habits list
       navigate("/habits");
     } else {
       alert("Login failed. Incorrect username or password");
@@ -99,6 +100,24 @@ function AccountPage() {
     }
   };
 
+  const generateRandomUsername = async () => {
+    try {
+      const response = await fetch(
+        `${VITE_RANDOM_USER_API_URL}/username?maxLen=8`,
+        {
+          method: "GET",
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setUsername(data.username);
+      }
+    } catch {
+      alert("Error generating random username.");
+    }
+  };
+
   return (
     <>
       <h1>Account</h1>
@@ -126,6 +145,9 @@ function AccountPage() {
           />
         </div>
         <br />
+        <button id="random-user-button" onClick={generateRandomUsername}>
+          Generate Random Username
+        </button>
         <div id="login-buttons-wrapper">
           <button className="habit-input-button" onClick={login}>
             Login

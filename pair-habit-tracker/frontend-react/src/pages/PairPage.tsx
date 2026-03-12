@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { type HabitType, type PairPostType } from "../components/Habit";
+import streaksIcon from "../assets/streaks-icon.png";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -10,7 +11,7 @@ function PairPage() {
   const [pairPosts, setPairPosts] = useState<PairPostType[]>([]);
   const [myPairings, setMyPairings] = useState<HabitType[]>([]);
   const [myHabits, setMyHabits] = useState<HabitType[]>([]);
-  const [showPostModal, setShowPostModal] = useState(false);
+  const [showPostMenu, setShowPostMenu] = useState(false);
 
   const getHeaders = () => {
     const sessionId = localStorage.getItem("sessionId") ?? "";
@@ -20,7 +21,7 @@ function PairPage() {
     };
   };
 
-  //fetch pair posts, user pairings, and user habits
+  //grab all the pair page data
   useEffect(() => {
     if (!cachedUsername) return;
 
@@ -55,7 +56,7 @@ function PairPage() {
     void fetchAll();
   }, [cachedUsername]);
 
-  //post a habit to the pair board
+  //post habit to the board
   const postHabit = async (habitId: string) => {
     try {
       const response = await fetch(`${API_URL}/pair-posts`, {
@@ -67,7 +68,7 @@ function PairPage() {
       if (response.status === 201) {
         const newPost = await response.json();
         setPairPosts((prev) => [newPost, ...prev]);
-        setShowPostModal(false);
+        setShowPostMenu(false);
       } else {
         alert("Failed to post habit.");
       }
@@ -76,7 +77,7 @@ function PairPage() {
     }
   };
 
-  //unpost a pair post
+  //remove a post
   const unpostHabit = async (postId: string) => {
     try {
       const response = await fetch(`${API_URL}/pair-posts/${postId}`, {
@@ -92,7 +93,7 @@ function PairPage() {
     }
   };
 
-  //pair with a posted habit
+  //pair with a post
   const pairWithPost = async (postId: string) => {
     try {
       const response = await fetch(`${API_URL}/pair-posts/${postId}/pair`, {
@@ -103,9 +104,9 @@ function PairPage() {
 
       if (response.ok) {
         const data = await response.json();
-        //remove from the board
+        //take it off the board
         setPairPosts((prev) => prev.filter((p) => p._id !== postId));
-        //add to my pairings
+        //add to pairings
         setMyPairings((prev) => [data.claimerHabit, ...prev]);
       } else {
         const err = await response.json();
@@ -116,7 +117,7 @@ function PairPage() {
     }
   };
 
-  //toggle completion on a paired habit
+  //check/uncheck a paired habit
   const togglePairingCompleted = async (id: string, completed: boolean) => {
     try {
       const response = await fetch(`${API_URL}/habits/${id}`, {
@@ -144,6 +145,27 @@ function PairPage() {
     }
   };
 
+  //unpair a habit (delete the habit and unlink partner)
+  const unpairHabit = async (id: string) => {
+    try {
+      const response = await fetch(`${API_URL}/habits/${id}/unpair`, {
+        method: "POST",
+        headers: getHeaders(),
+      });
+
+      if (response.ok) {
+        // remove from pairings and my habits lists
+        setMyPairings((prev) => prev.filter((p) => p._id !== id));
+        setMyHabits((prev) => prev.filter((h) => h._id !== id));
+      } else {
+        const err = await response.json();
+        alert(err.message || "Failed to unpair.");
+      }
+    } catch (error) {
+      console.error("Failed to unpair habit", error);
+    }
+  };
+
   const capitalize = (s: string) => s[0].toUpperCase() + s.slice(1);
 
   return (
@@ -156,6 +178,10 @@ function PairPage() {
           <div className="habits-list-container">
             {myPairings.map((habit) => (
               <div key={habit._id} className="habit-container">
+                <div className="habit-streak" title="Current streak">
+                  <img src={streaksIcon} alt="streak" className="streak-icon" />
+                  {habit.streak ?? 0}
+                </div>
                 <input
                   className="habit-checkbox"
                   type="checkbox"
@@ -165,24 +191,28 @@ function PairPage() {
                   }
                 />
                 <div className="habit-inner-wrapper">
-                  <div className="habit-title">
-                    {habit.title}
-                    {typeof habit.streak === "number" && (
-                      <span className="habit-streak" title="Current streak">
-                        {" "}
-                        🔥 {habit.streak}
+                  {habit.pairedWithUsername && (
+                    <div className="habit-banner">
+                      Paired with{" "}
+                      <span style={{ color: "blue" }}>
+                        {habit.pairedWithUsername}
                       </span>
-                    )}
+                    </div>
+                  )}
+                  <div className="habit-main-row">
+                    <div className="habit-title">{habit.title}</div>
+                    <div className="habit-interval">
+                      {capitalize(habit.interval)}
+                    </div>
                   </div>
-                  <div className="habit-interval">
-                    {capitalize(habit.interval)}
-                    {habit.pairedWithUsername && (
-                      <span className="habit-paired-label">
-                        {" "}
-                        · Paired with {habit.pairedWithUsername}
-                      </span>
-                    )}
-                  </div>
+                </div>
+                <div className="habit-actions">
+                  <button
+                    className="habit-input-button unpair-button"
+                    onClick={() => unpairHabit(habit._id)}
+                  >
+                    Unpair
+                  </button>
                 </div>
               </div>
             ))}
@@ -190,43 +220,49 @@ function PairPage() {
         </div>
       )}
 
-      {/* post habit button and modal */}
       <button
         id="add-habit-button"
-        onClick={() => setShowPostModal(!showPostModal)}
+        onClick={() => setShowPostMenu(!showPostMenu)}
       >
         Post Habit
       </button>
 
-      {showPostModal && (
-        <div className="post-habit-modal">
-          <h3>Choose a habit to post:</h3>
-          {myHabits.length === 0 && (
-            <p>You have no habits. Create one first!</p>
-          )}
-          {myHabits.map((habit) => (
-            <div key={habit._id} className="post-habit-option">
-              <span>
-                {habit.title} ({capitalize(habit.interval)})
-              </span>
+      {showPostMenu &&
+        (() => {
+          //only show habits that arent paired or posted yet
+          const postedHabitIds = new Set(pairPosts.map((p) => p.habitId));
+          const availableHabits = myHabits.filter(
+            (h) => !h.pairedWithHabitId && !postedHabitIds.has(h._id),
+          );
+          return (
+            <div className="post-habit-menu">
+              <h3>Choose a habit to post:</h3>
+              {availableHabits.length === 0 && (
+                <p>No available habits to post.</p>
+              )}
+              {availableHabits.map((habit) => (
+                <div key={habit._id} className="post-habit-option">
+                  <span>
+                    {habit.title} ({capitalize(habit.interval)})
+                  </span>
+                  <button
+                    className="habit-input-button"
+                    onClick={() => postHabit(habit._id)}
+                  >
+                    Post
+                  </button>
+                </div>
+              ))}
               <button
                 className="habit-input-button"
-                onClick={() => postHabit(habit._id)}
+                onClick={() => setShowPostMenu(false)}
               >
-                Post
+                Cancel
               </button>
             </div>
-          ))}
-          <button
-            className="habit-input-button"
-            onClick={() => setShowPostModal(false)}
-          >
-            Cancel
-          </button>
-        </div>
-      )}
+          );
+        })()}
 
-      {/* public pair board */}
       <h2>Public Board</h2>
       <div className="habits-list-container">
         {pairPosts.length === 0 && <p>No habits posted yet. Be the first!</p>}
@@ -236,9 +272,11 @@ function PairPage() {
             <div key={post._id} className="habit-container pair-post-container">
               <div className="pair-post-username">{post.posterUsername}</div>
               <div className="habit-inner-wrapper">
-                <div className="habit-title">{post.title}</div>
-                <div className="habit-interval">
-                  {capitalize(post.interval)}
+                <div className="habit-main-row">
+                  <div className="habit-title">{post.title}</div>
+                  <div className="habit-interval">
+                    {capitalize(post.interval)}
+                  </div>
                 </div>
               </div>
               {isOwn ? (

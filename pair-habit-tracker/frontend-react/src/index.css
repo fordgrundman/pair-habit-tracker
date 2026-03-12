@@ -81,8 +81,17 @@ li {
 #login-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
+  justify-self: center;
   gap: 0.5rem;
+  width: 25rem;
+}
+
+#random-user-button {
+  padding: 0.5rem;
+  align-self: center;
+  height: 2.5rem;
+  width: 19.4rem;
 }
 
 .login-field-wrapper {
@@ -96,12 +105,14 @@ li {
   flex-direction: row;
   gap: 0.5rem;
   justify-content: center;
+  align-self: center;
 }
 
 #login-container label {
   font-size: 1.25rem;
-  width: 7rem;
-  text-align: right;
+  width: 6rem;
+  text-align: left;
+  color: blue;
 }
 
 #login-container input {
@@ -121,8 +132,9 @@ li {
 
 .habit-container {
   display: flex;
-  height: 3rem;
+  min-height: 3rem;
   justify-content: center;
+  align-items: center;
 }
 
 .habit-streak {
@@ -142,22 +154,41 @@ li {
   border: 0.1rem solid black;
   width: 30rem;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0 1rem;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
   margin-right: 0.5rem;
+  word-break: break-word;
+}
+
+.habit-banner {
+  border-bottom: 0.1rem solid black;
+  padding: 0.35rem 0.75rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+.habit-main-row {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
 }
 
 .habit-checkbox {
-  width: 3rem;
+  width: 2rem;
+  height: 2rem;
+  margin-right: 1rem;
 }
 
 .habit-interval {
   margin-left: auto;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .edit-icon {
   width: 2.5rem;
+  height: 2.5rem;
   background-image: url("./assets/edit-icon.png");
   background-position: center;
   background-size: contain;
@@ -170,6 +201,7 @@ li {
 
 .delete-icon {
   width: 2.5rem;
+  height: 2.5rem;
   background-image: url("./assets/delete-icon.png");
   background-position: center;
   background-size: contain;
@@ -187,6 +219,7 @@ li {
   background-color: #08eb08;
   border: none;
   border-radius: 0.2rem;
+  margin-top: 1rem;
   margin-bottom: 1rem;
 }
 
@@ -306,4 +339,46 @@ li {
 
 #edit-habit-completed-checkbox {
   margin-left: -0.4rem;
+}
+
+/* ------------------------------------------------ Pair Page Styles --------------------------------------------------*/
+.post-habit-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.post-habit-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 30rem;
+  border: 0.1rem solid black;
+  padding: 0.5rem 1rem;
+  word-break: break-word;
+}
+
+.pair-post-username {
+  color: blue;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 4rem;
+  flex-shrink: 0;
+  word-break: break-word;
+  margin-right: 0.5rem;
+}
+
+.unpost-button,
+.pair-button {
+  width: 5rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

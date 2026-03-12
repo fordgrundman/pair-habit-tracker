@@ -14,11 +14,11 @@ const habitSchema = new mongoose.Schema(
     },
     completed: { type: Boolean, required: true, default: false },
 
-    //streak tracking
+    //streaks
     streak: { type: Number, default: 0 },
     lastCompletedAt: { type: Date, default: null },
 
-    //pairing links two habits together
+    //pairing
     pairedWithHabitId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Habit",
@@ -31,7 +31,7 @@ const habitSchema = new mongoose.Schema(
 
 const Habit = mongoose.model("Habit", habitSchema);
 
-//pair post schema for the public pair board
+//pair post schema
 const pairPostSchema = new mongoose.Schema(
   {
     habitId: {
@@ -48,7 +48,7 @@ const pairPostSchema = new mongoose.Schema(
 
 const PairPost = mongoose.model("PairPost", pairPostSchema);
 
-//connect to MongoDB
+//connect to mongo
 async function connect() {
   try {
     await mongoose.connect(process.env.MONGODB_CONNECT_STRING, {
@@ -62,7 +62,7 @@ async function connect() {
   }
 }
 
-//figures out when the current interval started (daily or weekly)
+//get the start of the current interval
 function getIntervalStart(interval) {
   const now = new Date();
   if (interval === "daily") {
@@ -70,7 +70,7 @@ function getIntervalStart(interval) {
       Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
     );
   }
-  //weekly resets on Monday 00:00 UTC
+  //weekly resets monday midnight utc
   const day = now.getUTCDay();
   const diff = day === 0 ? 6 : day - 1;
   const monday = new Date(
@@ -83,7 +83,7 @@ async function applyIntervalResets(habitDocs) {
   const bulkOps = [];
 
   for (const h of habitDocs) {
-    //handle old habits that predate the streak fields
+    //default streak fields for old habits
     h.streak ??= 0;
     h.lastCompletedAt ??= null;
 
@@ -92,9 +92,9 @@ async function applyIntervalResets(habitDocs) {
     const completedInCurrentInterval = lastDone && lastDone >= intervalStart;
 
     if (!completedInCurrentInterval) {
-      //new interval started and user didnt complete the prior one
+      //missed the last interval
       if (h.completed) {
-        //edge case: completed=true but lastCompletedAt is stale
+        //completed but lastCompletedAt is stale
         bulkOps.push({
           updateOne: {
             filter: { _id: h._id },
@@ -104,7 +104,7 @@ async function applyIntervalResets(habitDocs) {
         h.completed = false;
         h.streak = 0;
       } else if (h.streak > 0 && lastDone) {
-        //missed the interval entirely so reset streak
+        //missed it, reset streak
         bulkOps.push({
           updateOne: {
             filter: { _id: h._id },
@@ -113,8 +113,6 @@ async function applyIntervalResets(habitDocs) {
         });
         h.streak = 0;
       }
-    } else if (completedInCurrentInterval && h.completed) {
-      //already done this interval, nothing to do
     }
   }
 
@@ -143,14 +141,14 @@ async function deleteHabit(id) {
   const habit = await Habit.findById(id).exec();
   if (!habit) return null;
 
-  //if this habit was paired, unlink the partner
+  //unlink the partner if paired
   if (habit.pairedWithHabitId) {
     await Habit.findByIdAndUpdate(habit.pairedWithHabitId, {
       $set: { pairedWithHabitId: null, pairedWithUsername: null },
     });
   }
 
-  //remove any pair posts for this habit
+  //clean up pair posts
   await PairPost.deleteMany({ habitId: id });
 
   return await Habit.findByIdAndDelete(id).exec();
@@ -160,12 +158,12 @@ async function updateHabit(id, updates) {
   return await Habit.findByIdAndUpdate(id, updates, { new: true }).exec();
 }
 
-//handles streak logic when toggling completion
+//toggle completion with streak logic
 async function toggleCompletion(id, completed) {
   const habit = await Habit.findById(id).exec();
   if (!habit) return null;
 
-  //handle old habits that predate the streak fields
+  //default streak fields for old habits
   habit.streak ??= 0;
   habit.lastCompletedAt ??= null;
 
@@ -177,7 +175,7 @@ async function toggleCompletion(id, completed) {
     habit.lastCompletedAt = now;
 
     if (habit.pairedWithHabitId) {
-      //paired habit, only advance streak if partner also completed this interval
+      //paired, only bump streak if partner also finished
       const partner = await Habit.findById(habit.pairedWithHabitId).exec();
       const partnerDone =
         partner &&
@@ -191,7 +189,7 @@ async function toggleCompletion(id, completed) {
         await partner.save();
       }
     } else {
-      //solo habit, advance streak right away
+      //solo, bump streak
       habit.streak += 1;
     }
   } else {
@@ -203,7 +201,7 @@ async function toggleCompletion(id, completed) {
     if (wasCompleted && habit.streak > 0) {
       habit.streak -= 1;
 
-      //if paired, revert partner's streak bump too
+      //revert partner streak too if paired
       if (habit.pairedWithHabitId) {
         const partner = await Habit.findById(habit.pairedWithHabitId).exec();
         if (partner && partner.streak > 0) {
@@ -234,7 +232,11 @@ async function getPairPostById(id) {
   return await PairPost.findById(id).exec();
 }
 
-//user claims a pair post, creates linked habit for the claimer and links both together
+async function getPairPostByHabitId(habitId) {
+  return await PairPost.findOne({ habitId }).exec();
+}
+
+//claim a pair post and link both habits
 async function pairWithPost(postId, claimerUsername) {
   const post = await PairPost.findById(postId).exec();
   if (!post) return { error: "post_not_found" };
@@ -249,7 +251,7 @@ async function pairWithPost(postId, claimerUsername) {
     return { error: "original_habit_deleted" };
   }
 
-  //create a linked habit for the claimer
+  //make a habit for the claimer
   const claimerHabit = new Habit({
     username: claimerUsername,
     title: originalHabit.title,
@@ -261,18 +263,18 @@ async function pairWithPost(postId, claimerUsername) {
   });
   await claimerHabit.save();
 
-  //link the original habit back to the claimer
+  //link original back to claimer
   originalHabit.pairedWithHabitId = claimerHabit._id;
   originalHabit.pairedWithUsername = claimerUsername;
   await originalHabit.save();
 
-  //remove the post from the board
+  //take post off the board
   await PairPost.findByIdAndDelete(postId);
 
   return { claimerHabit, originalHabit };
 }
 
-//get habits this user is paired on
+//get users paired habits
 async function getPairedHabits(username) {
   return await Habit.find({
     username,
@@ -292,6 +294,7 @@ export {
   createPairPost,
   deletePairPost,
   getPairPostById,
+  getPairPostByHabitId,
   pairWithPost,
   getPairedHabits,
 };

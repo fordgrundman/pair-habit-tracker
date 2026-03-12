@@ -26,8 +26,7 @@ function App() {
       </header>
       <main>
         <Routes>
-          //redirect to account page when visiting root url
-          <Route path="/" element={<Navigate to="/account" replace />} />{" "}
+          <Route path="/" element={<Navigate to="/account" replace />} />
           <Route path="account" element={<AccountPage />} />
           <Route path="/habits" element={<HabitsList />} />
           <Route path="/add-habit" element={<AddHabit />} />

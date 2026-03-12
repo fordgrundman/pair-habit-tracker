@@ -18,13 +18,12 @@ app.use(
   }),
 );
 
-//auth microservice settings
+//auth config
 const AUTH_URL = process.env.AUTH_URL || "http://127.0.0.1:5000";
 const APP_ID = process.env.APP_ID || "";
 const APP_SECRET = process.env.APP_SECRET || "";
 
-//validates session via auth microservice introspect endpoint
-//expects X-Session-Id header, attaches req.userId and req.appId on success
+//check session with auth service
 async function requireAuth(req, res, next) {
   const sessionId = req.headers["x-session-id"] || "";
   if (!sessionId) {
@@ -144,7 +143,7 @@ app.patch("/habits/:id", requireAuth, async (req, res) => {
   }
 
   try {
-    //if only toggling completed, use streak-aware logic
+    //just toggling completed, use streak logic
     if (
       typeof completed !== "undefined" &&
       typeof title === "undefined" &&
@@ -157,7 +156,13 @@ app.patch("/habits/:id", requireAuth, async (req, res) => {
       return res.status(200).json(updatedHabit);
     }
 
-    //otherwise just update the fields normally
+    //block editing paired habits
+    const existing = await habits.getHabitById(id);
+    if (existing && existing.pairedWithHabitId) {
+      return res.status(403).json({ message: "cannot edit a paired habit" });
+    }
+
+    //normal field update
     const updatedHabit = await habits.updateHabit(id, {
       title,
       interval,
@@ -183,6 +188,12 @@ app.delete("/habits/:id", requireAuth, async (req, res) => {
   }
 
   try {
+    //block deleting paired habits
+    const existing = await habits.getHabitById(id);
+    if (existing && existing.pairedWithHabitId) {
+      return res.status(403).json({ message: "cannot delete a paired habit" });
+    }
+
     const deletedHabit = await habits.deleteHabit(id);
 
     if (!deletedHabit) {
@@ -196,7 +207,7 @@ app.delete("/habits/:id", requireAuth, async (req, res) => {
   }
 });
 
-//pair board routes
+//pair board
 
 app.get("/pair-posts", requireAuth, async (req, res) => {
   try {
@@ -208,7 +219,6 @@ app.get("/pair-posts", requireAuth, async (req, res) => {
   }
 });
 
-//post a habit to the pair board
 app.post("/pair-posts", requireAuth, async (req, res) => {
   const { habitId } = req.body ?? {};
 
@@ -218,6 +228,17 @@ app.post("/pair-posts", requireAuth, async (req, res) => {
 
   try {
     const habit = await habits.getHabitById(habitId);
+
+    //cant post a paired habit
+    if (habit && habit.pairedWithHabitId) {
+      return res.status(400).json({ message: "this habit is already paired" });
+    }
+
+    //no duplicate posts
+    const existingPost = await habits.getPairPostByHabitId(habitId);
+    if (existingPost) {
+      return res.status(400).json({ message: "this habit is already posted" });
+    }
     if (!habit) {
       return res.status(404).json({ message: "habit not found" });
     }
@@ -236,7 +257,6 @@ app.post("/pair-posts", requireAuth, async (req, res) => {
   }
 });
 
-//unpost a pair post
 app.delete("/pair-posts/:id", requireAuth, async (req, res) => {
   const { id } = req.params;
 
@@ -254,7 +274,6 @@ app.delete("/pair-posts/:id", requireAuth, async (req, res) => {
   }
 });
 
-//pair with a posted habit
 app.post("/pair-posts/:id/pair", requireAuth, async (req, res) => {
   const { id } = req.params;
   const { username } = req.body ?? {};
@@ -290,7 +309,6 @@ app.post("/pair-posts/:id/pair", requireAuth, async (req, res) => {
   }
 });
 
-//get habits the user is paired on
 app.get("/my-pairings", requireAuth, async (req, res) => {
   const { username } = req.query;
   if (!username || typeof username !== "string") {
@@ -303,6 +321,33 @@ app.get("/my-pairings", requireAuth, async (req, res) => {
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "failed to fetch pairings" });
+  }
+});
+
+//unpair a habit: delete the habit and unlink its partner
+app.post("/habits/:id/unpair", requireAuth, async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res.status(400).json({ message: "habit id is required" });
+  }
+
+  try {
+    const existing = await habits.getHabitById(id);
+    if (!existing) {
+      return res.status(404).json({ message: "habit not found" });
+    }
+
+    if (!existing.pairedWithHabitId) {
+      return res.status(400).json({ message: "habit is not paired" });
+    }
+
+    //deleteHabit unlinks the partner if paired
+    await habits.deleteHabit(id);
+    return res.status(200).json({ id });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "failed to unpair habit" });
   }
 });
 

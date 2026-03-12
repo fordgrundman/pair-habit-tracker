@@ -22,6 +22,7 @@ type HabitProps = HabitType & {
   onToggleCompleted: (id: string, completed: boolean) => void;
   onEdit: (habit: HabitType) => void;
   intervalLabel?: string;
+  showActions?: boolean;
 };
 
 import streaksIcon from "../assets/streaks-icon.png";
@@ -37,6 +38,7 @@ function Habit({
   onToggleCompleted,
   onEdit,
   intervalLabel,
+  showActions = true,
 }: HabitProps) {
   const displayInterval = intervalLabel ?? interval;
   return (
@@ -52,40 +54,46 @@ function Habit({
         onChange={(event) => onToggleCompleted(_id, event.target.checked)}
       />
       <div className="habit-inner-wrapper">
-        <div className="habit-title">{title}</div>
-        <div className="habit-interval">
-          {displayInterval}
-          {pairedWithUsername && (
-            <span className="habit-paired-label">
-              {" "}
-              · Paired with {pairedWithUsername}
-            </span>
-          )}
+        {pairedWithUsername && (
+          <div className="habit-banner">
+            Paired with{" "}
+            <span style={{ color: "blue" }}>{pairedWithUsername}</span>
+          </div>
+        )}
+        <div className="habit-main-row">
+          <div className="habit-title">{title}</div>
+          <div className="habit-interval">{displayInterval}</div>
         </div>
       </div>
-      <div
-        className="edit-icon"
-        onClick={() =>
-          onEdit({
-            _id,
-            title,
-            interval,
-            completed,
-          })
-        }
-      />
-      <div
-        className="delete-icon"
-        onClick={() => {
-          const shouldDelete = window.confirm(
-            "Are you sure you want to delete this habit? This action can't be undone.",
-          );
+      {showActions ? (
+        <>
+          <div
+            className="edit-icon"
+            onClick={() =>
+              onEdit({
+                _id,
+                title,
+                interval,
+                completed,
+              })
+            }
+          />
+          <div
+            className="delete-icon"
+            onClick={() => {
+              const shouldDelete = window.confirm(
+                "Are you sure you want to delete this habit? This action can't be undone.",
+              );
 
-          if (shouldDelete) {
-            onDelete(_id);
-          }
-        }}
-      />
+              if (shouldDelete) {
+                onDelete(_id);
+              }
+            }}
+          />
+        </>
+      ) : (
+        <div style={{ width: "5rem" }} />
+      )}
     </div>
   );
 }

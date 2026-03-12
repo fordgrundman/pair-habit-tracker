@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 //one-time wipe of old test habits and pair posts
 async function clearAll() {
-  await mongoose.connect(process.env.MONGO_DB_CONNECTION_STRING, {
+  await mongoose.connect(process.env.MONGODB_CONNECT_STRING, {
     dbName: "user-db",
   });
 
