@@ -333,18 +333,20 @@ app.post("/habits/:id/unpair", requireAuth, async (req, res) => {
   }
 
   try {
-    const existing = await habits.getHabitById(id);
-    if (!existing) {
+    const result = await habits.unpairHabit(id);
+
+    if (result.error === "habit_not_found") {
       return res.status(404).json({ message: "habit not found" });
     }
 
-    if (!existing.pairedWithHabitId) {
+    if (result.error === "habit_not_paired") {
       return res.status(400).json({ message: "habit is not paired" });
     }
 
-    //deleteHabit unlinks the partner if paired
-    await habits.deleteHabit(id);
-    return res.status(200).json({ id });
+    return res.status(200).json({
+      habit: result.unpairedHabit,
+      repostedPost: result.repostedPost,
+    });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "failed to unpair habit" });

@@ -21,6 +21,22 @@ function PairPage() {
     };
   };
 
+  const getErrorMessage = async (response: Response) => {
+    const contentType = response.headers.get("content-type") ?? "";
+
+    if (contentType.includes("application/json")) {
+      const data = await response.json();
+      return data.message || `Request failed (${response.status})`;
+    }
+
+    const text = await response.text();
+    if (text.includes("Cannot POST")) {
+      return `Endpoint not found (${response.status})`;
+    }
+
+    return `Request failed (${response.status})`;
+  };
+
   //grab all the pair page data
   useEffect(() => {
     if (!cachedUsername) return;
@@ -154,12 +170,44 @@ function PairPage() {
       });
 
       if (response.ok) {
-        // remove from pairings and my habits lists
+        const data = await response.json();
+
+        // remove from pairings
         setMyPairings((prev) => prev.filter((p) => p._id !== id));
-        setMyHabits((prev) => prev.filter((h) => h._id !== id));
+
+        // keep the habit in my list, but unpaired
+        if (data.habit) {
+          setMyHabits((prev) => {
+            const updated = prev.map((h) =>
+              h._id === data.habit._id ? data.habit : h,
+            );
+
+            if (updated.some((h) => h._id === data.habit._id)) {
+              return updated;
+            }
+
+            return [data.habit, ...updated];
+          });
+        }
+
+        if (data.repostedPost) {
+          setPairPosts((prev) => {
+            if (prev.some((p) => p._id === data.repostedPost._id)) {
+              return prev;
+            }
+            return [data.repostedPost, ...prev];
+          });
+        }
+
+        const boardRes = await fetch(`${API_URL}/pair-posts`, {
+          headers: getHeaders(),
+        });
+        if (boardRes.ok) {
+          setPairPosts(await boardRes.json());
+        }
       } else {
-        const err = await response.json();
-        alert(err.message || "Failed to unpair.");
+        const message = await getErrorMessage(response);
+        alert(message);
       }
     } catch (error) {
       console.error("Failed to unpair habit", error);

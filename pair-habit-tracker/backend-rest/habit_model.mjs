@@ -154,6 +154,43 @@ async function deleteHabit(id) {
   return await Habit.findByIdAndDelete(id).exec();
 }
 
+async function unpairHabit(id) {
+  const habit = await Habit.findById(id).exec();
+  if (!habit) return { error: "habit_not_found" };
+
+  if (!habit.pairedWithHabitId) {
+    return { error: "habit_not_paired" };
+  }
+
+  const partnerId = habit.pairedWithHabitId;
+
+  habit.pairedWithHabitId = null;
+  habit.pairedWithUsername = null;
+  await habit.save();
+
+  const partner = await Habit.findById(partnerId).exec();
+  if (partner) {
+    partner.pairedWithHabitId = null;
+    partner.pairedWithUsername = null;
+    await partner.save();
+  }
+
+  const existingPost = await PairPost.findOne({ habitId: habit._id }).exec();
+  if (existingPost) {
+    return { unpairedHabit: habit, repostedPost: existingPost };
+  }
+
+  const repostedPost = new PairPost({
+    habitId: habit._id,
+    posterUsername: habit.username,
+    title: habit.title,
+    interval: habit.interval,
+  });
+  await repostedPost.save();
+
+  return { unpairedHabit: habit, repostedPost };
+}
+
 async function updateHabit(id, updates) {
   return await Habit.findByIdAndUpdate(id, updates, { new: true }).exec();
 }
@@ -288,6 +325,7 @@ export {
   getHabitById,
   createHabit,
   deleteHabit,
+  unpairHabit,
   updateHabit,
   toggleCompletion,
   getAllPairPosts,
