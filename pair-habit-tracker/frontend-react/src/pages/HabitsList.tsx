@@ -102,6 +102,25 @@ function HabitsList() {
     navigate("/habits/edit");
   };
 
+  const unpairHabit = async (id: string) => {
+    try {
+      const response = await fetch(`${API_URL}/habits/${id}/unpair`, {
+        method: "POST",
+        headers: getHeaders(),
+      });
+
+      if (!response.ok) {
+        return;
+      }
+
+      setUserHabits((prevHabits) =>
+        prevHabits.filter((habit) => habit._id !== id),
+      );
+    } catch (error) {
+      console.error("Failed to unpair habit", error);
+    }
+  };
+
   return (
     <>
       <h1>Habits List</h1>
@@ -127,6 +146,7 @@ function HabitsList() {
             onDelete={deleteHabit}
             onToggleCompleted={toggleCompleted}
             onEdit={editHabit}
+            onUnpair={habit.pairedWithHabitId ? unpairHabit : undefined}
             showActions={!habit.pairedWithHabitId}
           />
         ))}

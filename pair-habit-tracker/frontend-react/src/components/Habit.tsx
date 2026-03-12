@@ -21,6 +21,7 @@ type HabitProps = HabitType & {
   onDelete: (id: string) => void;
   onToggleCompleted: (id: string, completed: boolean) => void;
   onEdit: (habit: HabitType) => void;
+  onUnpair?: (id: string) => void;
   intervalLabel?: string;
   showActions?: boolean;
 };
@@ -34,9 +35,11 @@ function Habit({
   completed,
   streak,
   pairedWithUsername,
+  pairedWithHabitId,
   onDelete,
   onToggleCompleted,
   onEdit,
+  onUnpair,
   intervalLabel,
   showActions = true,
 }: HabitProps) {
@@ -65,7 +68,16 @@ function Habit({
           <div className="habit-interval">{displayInterval}</div>
         </div>
       </div>
-      {showActions ? (
+      {onUnpair && pairedWithHabitId ? (
+        <div className="habit-actions">
+          <button
+            className="habit-input-button unpair-button"
+            onClick={() => onUnpair(_id)}
+          >
+            Unpair
+          </button>
+        </div>
+      ) : showActions ? (
         <>
           <div
             className="edit-icon"

@@ -373,9 +373,6 @@ li {
   margin-left: 1rem;
 }
 
-.pair-post-container {
-}
-
 .unpost-button,
 .pair-button {
   width: 5rem;
@@ -385,4 +382,12 @@ li {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* ------------------------------------------------ Holiday Banner --------------------------------------------------*/
+#holiday-banner-container {
+  height: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

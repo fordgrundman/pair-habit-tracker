@@ -12,11 +12,13 @@ import AccountPage from "./pages/AccountPage";
 import AddHabit from "./pages/AddHabit";
 import EditHabit from "./pages/EditHabit";
 import PairPage from "./pages/PairPage";
+import HolidayBanner from "./components/HolidayBanner";
 
 function App() {
   return (
     <Router>
       <header>
+        <HolidayBanner />
         <nav>
           <Link to="/account">Account</Link>
           <Link to="/habits">Habits List</Link>

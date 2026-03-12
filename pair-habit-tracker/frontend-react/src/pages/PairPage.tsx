@@ -254,13 +254,6 @@ function PairPage() {
         </div>
       )}
 
-      <button
-        id="add-habit-button"
-        onClick={() => setShowPostMenu(!showPostMenu)}
-      >
-        Post Habit
-      </button>
-
       {showPostMenu &&
         (() => {
           //only show habits that arent paired or posted yet
@@ -298,6 +291,13 @@ function PairPage() {
         })()}
 
       <h2>Public Board</h2>
+      <button
+        id="add-habit-button"
+        onClick={() => setShowPostMenu(!showPostMenu)}
+        style={{ backgroundColor: "blue", color: "white", marginTop: 0 }}
+      >
+        Post Habit
+      </button>
       <div className="habits-list-container">
         {pairPosts.length === 0 && <p>No habits posted yet. Be the first!</p>}
         {pairPosts.map((post) => {
