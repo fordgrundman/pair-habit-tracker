@@ -31,7 +31,9 @@ function HolidayBanner() {
 
   return (
     <div id="holiday-banner-container">
-      <span style={{ marginRight: "0.5rem" }}>Upcoming Holidays: </span>
+      <span style={{ marginRight: "0.5rem" }}>
+        Upcoming Holidays Reminder:{" "}
+      </span>
       <span>{holidays.length > 0 ? holidays.join(", ") : ""}</span>
     </div>
   );

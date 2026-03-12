@@ -6,6 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 function HabitsList() {
   const [userHabits, setUserHabits] = useState<HabitType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [cachedUsername] = useState(
     () => localStorage.getItem("username") ?? "",
   );
@@ -23,6 +24,7 @@ function HabitsList() {
   //load the users habits
   useEffect(() => {
     if (!cachedUsername) {
+      setIsLoading(false);
       return;
     }
 
@@ -44,6 +46,8 @@ function HabitsList() {
         setUserHabits(habits);
       } catch (error) {
         console.error("Failed to fetch habits", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -132,6 +136,7 @@ function HabitsList() {
         Add Habit
       </button>
       <div className="habits-list-container">
+        {isLoading && <p>Loading...</p>}
         {userHabits.map((habit) => (
           <Habit
             key={habit._id}

@@ -12,6 +12,7 @@ function PairPage() {
   const [myPairings, setMyPairings] = useState<HabitType[]>([]);
   const [myHabits, setMyHabits] = useState<HabitType[]>([]);
   const [showPostMenu, setShowPostMenu] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   const getHeaders = () => {
     const sessionId = localStorage.getItem("sessionId") ?? "";
@@ -39,7 +40,10 @@ function PairPage() {
 
   //grab all the pair page data
   useEffect(() => {
-    if (!cachedUsername) return;
+    if (!cachedUsername) {
+      setIsInitialLoading(false);
+      return;
+    }
 
     const fetchAll = async () => {
       try {
@@ -66,6 +70,8 @@ function PairPage() {
         }
       } catch (error) {
         console.error("Failed to fetch pair page data", error);
+      } finally {
+        setIsInitialLoading(false);
       }
     };
 
@@ -206,7 +212,14 @@ function PairPage() {
     <>
       <h1>Pair Page</h1>
 
-      {myPairings.length > 0 && (
+      {isInitialLoading && (
+        <div className="my-pairings-section">
+          <h2>My Pairings</h2>
+          <p>Loading...</p>
+        </div>
+      )}
+
+      {!isInitialLoading && myPairings.length > 0 && (
         <div className="my-pairings-section">
           <h2>My Pairings</h2>
           <div className="habits-list-container">
@@ -299,7 +312,10 @@ function PairPage() {
         Post Habit
       </button>
       <div className="habits-list-container">
-        {pairPosts.length === 0 && <p>No habits posted yet. Be the first!</p>}
+        {isInitialLoading && <p>Loading...</p>}
+        {!isInitialLoading && pairPosts.length === 0 && (
+          <p>No habits posted yet. Be the first!</p>
+        )}
         {pairPosts.map((post) => {
           const isOwn = post.posterUsername === cachedUsername;
           return (
