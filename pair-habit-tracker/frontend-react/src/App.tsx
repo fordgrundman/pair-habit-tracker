@@ -13,6 +13,7 @@ import AddHabit from "./pages/AddHabit";
 import EditHabit from "./pages/EditHabit";
 import PairPage from "./pages/PairPage";
 import HolidayBanner from "./components/HolidayBanner";
+import BuddhaQuote from "./components/BuddhaQuote";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
         </Routes>
       </main>
       <footer>
+        <BuddhaQuote />
         <div id="tagline">~Track your habits to stay consistent~</div>
         <p>© Ford Grundman</p>
       </footer>
