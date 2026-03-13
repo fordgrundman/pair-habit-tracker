@@ -9,18 +9,11 @@ function BuddhaQuote() {
       const response = await fetch(BUDDHA_API_URL, {
         method: "POST",
       });
-
       if (!response.ok) {
         return;
       }
-
-      const body = await response.text();
-      if (!body) {
-        return;
-      }
-
-      const data = JSON.parse(body);
-      setQuote(data.text || data.quote || "");
+      const data = await response.json();
+      setQuote(data.text);
     } catch (error) {
       console.error("Failed to fetch Buddha quote", error);
     }
