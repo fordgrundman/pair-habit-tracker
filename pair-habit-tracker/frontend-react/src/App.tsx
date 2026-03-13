@@ -40,7 +40,6 @@ function App() {
       </main>
       <footer>
         <BuddhaQuote />
-        <div id="tagline">~Track your habits to stay consistent~</div>
         <p>© Ford Grundman</p>
       </footer>
     </Router>

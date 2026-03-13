@@ -128,6 +128,7 @@ function HabitsList() {
   return (
     <>
       <h1>Habits List</h1>
+      <div id="tagline">~Track your habits to stay consistent~</div>
       <p>
         Hello
         <span style={{ color: "blue" }}> {cachedUsername}</span>!

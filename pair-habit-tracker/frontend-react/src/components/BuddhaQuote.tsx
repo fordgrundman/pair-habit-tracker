@@ -23,7 +23,7 @@ function BuddhaQuote() {
     void fetchQuote();
   }, []);
 
-  return <div>{quote}</div>;
+  return <div style={{ fontSize: 15 }}>{quote}</div>;
 }
 
 export default BuddhaQuote;
